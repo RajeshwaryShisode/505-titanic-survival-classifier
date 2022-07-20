@@ -1,6 +1,7 @@
+from typing import Counter
 import dash
-from dash.dependencies import Input, Output, State
-from dash import dcc, html
+from dash.dependencies import Input, Output
+from dash import dcc, html, callback_context
 import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
@@ -10,8 +11,6 @@ from utils import display_eval_metrics, Viridis
 
 
 df=pd.read_csv('resources/final_probs.csv')
-
-
 ## Instantiante Dash
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -114,6 +113,7 @@ def update_user_table(family, age, cabin, title, sex, embark):
         html.Div(f'Embarkation: {embark}'),
     ])
 
+
 # Tab 4 Callback # 2
 @app.callback(Output('final_prediction', 'children'),
             [
@@ -122,9 +122,10 @@ def update_user_table(family, age, cabin, title, sex, embark):
               Input('cabin_dropdown', 'value'),
               Input('title_radio', 'value'),
               Input('sex_radio', 'value'),
-              Input('port_radio', 'value')
+              Input('port_radio', 'value'),
+              Input('button', 'n_clicks')
               ])
-def final_prediction(family, age, cabin, title, sex, embark):
+def final_prediction(family, age, cabin, title, sex, embark, n_clicks):
     inputs=[family, age, cabin, title, sex, embark]
     keys=['family', 'age', 'cabin', 'title', 'sex', 'embark']
     dict6=dict(zip(keys, inputs))
@@ -158,10 +159,18 @@ def final_prediction(family, age, cabin, title, sex, embark):
     print('myarray', myarray)
     thisarray=myarray.reshape((1, myarray.shape[0]))
     print('thisarray', thisarray)
+    print('n_clicks', n_clicks)
 
-    prob=logreg.predict_proba(thisarray)
-    final_prob=round(float(prob[0][1])*100,1)
-    return(f'Probability of Survival: {final_prob}%')
+    changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+    if 'button' in changed_id:
+        prob=logreg.predict_proba(thisarray)
+        final_prob=round(float(prob[0][1])*100,1)
+        return(f'Probability of Survival: {final_prob}%')
+    else: 
+        return
+    
+        
+
 
 
 

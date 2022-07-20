@@ -1,3 +1,4 @@
+from tkinter.ttk import Style
 import dash
 from dash import dcc, html
 import pandas as pd
@@ -77,12 +78,17 @@ tab_4_layout = html.Div([
     html.Br(),
     html.Br(),
     html.Br(),
+
     # Output results
     html.Div([
         html.Div(id='user-inputs-box', style={'text-align':'center','fontSize':18}),
         html.Div(id='final_prediction', style={'color':'red','text-align':'center','fontSize':18})
     ],className='twelve columns'),
 
-
+    html.Div([
+        html.Button('Submit', id='button', style={'float': 'right', 'background-color': 'cornflowerblue', 'fontSize':20, 'margin-right': '90px'}),
+        html.Div(id='my-div')
+    ]),
 
 ])
+
